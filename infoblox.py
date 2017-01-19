@@ -1041,3 +1041,26 @@ class Infoblox(object):
 	    raise Exception(r)
 	except Exception:
 	    raise
+
+	def get_all_ipv4_address(self):
+		""" Implements IBA rest call to retrieve ipv4 addresses. Returns json data to caller to operate on it
+		returns a max of 10000 records
+		"""
+		rest_url = 'https://' + self.iba_host + '/wapi/v' + self.iba_wapi_version + '/record:ipv4address'
+		max_results = 10000
+		req_params = {'_max_results': str(max_results)}
+		try:
+			r = requests.get(url=rest_url, params=req_params, auth=(self.iba_user, self.iba_password), verify=self.iba_verify_ssl)
+			r_json = r.json()
+			if r.status_code == 200:
+				return r_json
+			else:
+				print r.status_code
+				if 'text' in r_json:
+					raise InfobloxGeneralException(r_json['text'])
+				else:
+					r.raise_for_status()
+		except ValueError:
+			raise Exception(r)
+		except Exception:
+			raise
